@@ -1,0 +1,52 @@
+#!/usr/bin/python3
+"""
+Engine Module for serializing and deserializing data
+"""
+import json
+import os
+from models.base_model import BaseModel
+from models.user import User
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.city import City
+
+class FileStorage:
+    """FileStorage for storing, serializing and deserializing data"""
+    __file_path = "file.json"
+    __objects = {}
+
+    def new(self, obj):
+        """Sets new class"""
+        obj_name = obj.__class__.__name__
+        k = "{}.{}".format(obj_name, obj.id)
+        FileStorage.__objects[k] = obj
+
+    def all(self):
+        """ show all instances """
+        return  FileStorage.__objects
+
+    def save(self):
+        """save all instances """
+        objs = FileStorage.__objects
+        objs_dict = {}
+        for obj in objs.keys():
+            objs_dict[obj] = objs[obj].to_dict()
+        with open(FileStorage.__file_path, "w", encoding="utf-8") as file:
+            json.dump(objs_dict, file)
+
+    def reload(self):
+        """deserializes the JSON file"""
+        if os.path.isfile(FileStorage.__file_path):
+            with open(FileStorage.__file_path, "r", encoding="utf-8") as file:
+                try:
+                    objs_dict = json.load(file)
+                    for k, v in objs_dict.items():
+                        class_name, obj_id = k.split('.')
+                        cls = eval(class_name)
+                        inst = cls(**v)
+                        FileStorage.__objects[k] = inst
+                except Exception:
+                    pass
+
