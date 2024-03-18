@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Console shell module"""
+"""Console shell modules"""
 
 import ast
 import shlex
